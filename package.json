@@ -1,0 +1,18 @@
+{
+  "name": "nuncio",
+  "version": "1.0.0",
+  "description": "Nuncio is a command-line tool for keeping your GIT repositories and NPM projects updated",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "execa": "^4.0.2",
+    "yargs": "^15.3.1"
+  },
+  "bin": {
+    "nuncio": "./bin/nuncio.js"
+  }
+}
