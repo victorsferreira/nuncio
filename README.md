@@ -17,7 +17,7 @@ $ npm install --global nuncio
 $ npm install --save-dev nuncio
 ```
 
-By default, **nuncio** will checkout to the `master` branch.
+By default, **nuncio** will checkout and commit in the `master` branch.
 
 You can pass one of the three *semver* options `major`, `minor` e `patch`. Default is `major`.
 
