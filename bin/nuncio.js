@@ -9,7 +9,7 @@ const { argv } = yargs;
 
 const packageJsonPath = path.join(process.cwd(), 'package.json');
 const packageJson = require(packageJsonPath);
-const { version } = packageJson;
+const { version, name: appName } = packageJson;
 
 const versions = version.split('.').reduce((acc, cur, i) => {
     let v;
@@ -23,6 +23,7 @@ const versions = version.split('.').reduce((acc, cur, i) => {
     return acc;
 }, {});
 
+const { npm } = argv;
 const branch = (argv.branch || argv.b) || 'master';
 const semver = (argv.semver || argv.s) || 'major';
 const remote = (argv.remote || argv.r) || 'origin';
@@ -37,12 +38,12 @@ function changePackageJson(content) {
 async function executeGitCommand(command, options = {}) {
     const commandList = command.split(' ');
     const extraCommands = Object.keys(options).reduce((acc, key) => {
-        acc.push(key); 
+        acc.push(key);
         acc.push(options[key]);
 
         return acc;
     }, []);
-    
+
     return execa.sync('git', [...commandList, ...extraCommands]);
 }
 
@@ -62,9 +63,18 @@ async function createNewTag(version) {
 
 async function commitNewVersion(newVersion) {
     await executeGitCommand('add .');
-    await executeGitCommand('commit', {'-m': `chore: ${newVersion}`});
+    await executeGitCommand('commit', { '-m': `chore: ${newVersion}` });
 
     return executeGitCommand.bind(null, "reset --hard HEAD~1");
+}
+
+async function publishOnNpm(appName, version) {
+    await execa.sync('npm', ['publish']);
+
+    return console.log.bind(null, `
+        Something went wrong and we could not revert the last operations. 
+        Check your NPM account for the app "${appName}" and version "${version}"
+    `);
 }
 
 async function pushCommitAndTag(remote, branch, newVersion) {
@@ -92,8 +102,12 @@ async function pushCommitAndTag(remote, branch, newVersion) {
         rollbacks.push(await createNewTag(newVersion));
         // Push commit and tag
         rollbacks.push(await pushCommitAndTag(remote, branch, newVersion));
+        // Publish on NPM
+        if (npm) {
+            rollbacks.push(await publishOnNpm(appName, newVersion));
+        }
     } catch (err) {
-        console.log(err.stderr)
+        console.log(err.stderr);
         // Rollback the finished tasks
         for (let rollback of rollbacks) {
             await rollback();
