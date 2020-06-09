@@ -31,11 +31,11 @@ const message = argv.message || argv.m;
 
 versions[semver]++;
 if (semver !== 'patch') {
-    // If major or minor, increases patch
-    versions.patch++;
+    // If major or minor, sets patch equals 0
+    versions.patch = 0;
     if (semver === 'major') {
-        // If major, increases minor
-        versions.minor++;
+        // If major, sets minor equals 0
+        versions.minor = 0;
     }
 }
 
