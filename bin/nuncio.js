@@ -58,7 +58,7 @@ async function setVersionInPackageJson(newVersion) {
 
 async function createNewTag(version, message) {
     const tagMessage = message || version;
-    await executeGitCommand(`tag -a ${version} -m ${tagMessage}`);
+    await executeGitCommand(`tag -a ${version}`, { '-m': tagMessage });
 
     return executeGitCommand.bind(null, `tag -d ${version}`);
 }

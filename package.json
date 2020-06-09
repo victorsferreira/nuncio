@@ -1,10 +1,16 @@
 {
   "name": "nuncio-cli",
-  "version": "1.1.2",
+  "version": "1.2.2",
   "description": "Nuncio is a command-line tool for keeping your GIT repositories and NPM projects updated",
   "main": "index.js",
   "scripts": {},
-  "keywords": ["pipeline", "ci", "cd", "versioning", "tooling"],
+  "keywords": [
+    "pipeline",
+    "ci",
+    "cd",
+    "versioning",
+    "tooling"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
