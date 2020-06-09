@@ -27,6 +27,7 @@ const { npm } = argv;
 const branch = (argv.branch || argv.b) || 'master';
 const semver = (argv.semver || argv.s) || 'major';
 const remote = (argv.remote || argv.r) || 'origin';
+const message = argv.message || argv.m;
 
 versions[semver]++;
 const newVersion = [versions.major, versions.minor, versions.patch].join('.');
@@ -55,15 +56,18 @@ async function setVersionInPackageJson(newVersion) {
     return setVersionInPackageJson.bind(null, oldVersion);
 }
 
-async function createNewTag(version) {
-    await executeGitCommand(`tag -a ${version} -m ${version}`);
+async function createNewTag(version, message) {
+    const tagMessage = message || version;
+    await executeGitCommand(`tag -a ${version} -m ${tagMessage}`);
 
     return executeGitCommand.bind(null, `tag -d ${version}`);
 }
 
-async function commitNewVersion(newVersion) {
+async function commitNewVersion(newVersion, message) {
+    const commitMessage = [newVersion, message].join(' - ');
+
     await executeGitCommand('add .');
-    await executeGitCommand('commit', { '-m': `chore: ${newVersion}` });
+    await executeGitCommand('commit', { '-m': `chore: ${commitMessage}` });
 
     return executeGitCommand.bind(null, "reset --hard HEAD~1");
 }
@@ -97,9 +101,9 @@ async function pushCommitAndTag(remote, branch, newVersion) {
         // Change package.json
         rollbacks.push(await setVersionInPackageJson(newVersion));
         // Add files and commit
-        rollbacks.push(await commitNewVersion(newVersion));
+        rollbacks.push(await commitNewVersion(newVersion, message));
         // Create tag
-        rollbacks.push(await createNewTag(newVersion));
+        rollbacks.push(await createNewTag(newVersion, message));
         // Push commit and tag
         rollbacks.push(await pushCommitAndTag(remote, branch, newVersion));
         // Publish on NPM
