@@ -30,6 +30,15 @@ const remote = (argv.remote || argv.r) || 'origin';
 const message = argv.message || argv.m;
 
 versions[semver]++;
+if (semver !== 'patch') {
+    // If major or minor, increases patch
+    versions.patch++;
+    if (semver === 'major') {
+        // If major, increases minor
+        versions.minor++;
+    }
+}
+
 const newVersion = [versions.major, versions.minor, versions.patch].join('.');
 
 function changePackageJson(content) {
