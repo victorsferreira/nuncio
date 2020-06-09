@@ -73,7 +73,10 @@ async function createNewTag(version, message) {
 }
 
 async function commitNewVersion(newVersion, message) {
-    const commitMessage = [newVersion, message].join(' - ');
+    const commitMessageParts = [newVersion];
+    if (message) commitMessageParts.push(message);
+
+    const commitMessage = commitMessageParts.join(' - ');
 
     await executeGitCommand('add .');
     await executeGitCommand('commit', { '-m': `chore: ${commitMessage}` });
