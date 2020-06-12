@@ -59,6 +59,7 @@ async function executeGitCommand(command, options = {}) {
 }
 
 async function setVersionInPackageJson(newVersion) {
+    console.log(`Changing package.json version to ${newVersion}`);
     const oldVersion = packageJson.version;
     packageJson.version = newVersion;
     await changePackageJson(JSON.stringify(packageJson, null, 2));
@@ -68,6 +69,8 @@ async function setVersionInPackageJson(newVersion) {
 
 async function createNewTag(tagName, message) {
     const tagMessage = message || tagName;
+
+    console.log(`Creating new tag ${tagName}`);
     await executeGitCommand(`tag -a ${tagName}`, { '-m': tagMessage });
 
     return executeGitCommand.bind(null, `tag -d ${tagName}`);
@@ -79,6 +82,8 @@ async function commitNewVersion(newVersion, message) {
 
     const commitMessage = commitMessageParts.join(' - ');
 
+    console.log(`Commiting new version`);
+
     await executeGitCommand('add .');
     await executeGitCommand('commit', { '-m': `chore: ${commitMessage}` });
 
@@ -86,6 +91,8 @@ async function commitNewVersion(newVersion, message) {
 }
 
 async function publishOnNpm(appName, version) {
+    console.log(`Publishing to NPM ${appName}`);
+
     await execa.sync('npm', ['publish']);
 
     return console.log.bind(null, `
@@ -96,6 +103,9 @@ async function publishOnNpm(appName, version) {
 
 async function pushCommitAndTag(remote, branch, version, prefix) {
     const tagName = `${prefix}${version}`;
+
+    console.log(`Pushing commit and tag`);
+
     await executeGitCommand(`push ${remote} ${branch}`);
     await executeGitCommand(`push ${remote} ${tagName}`);
 

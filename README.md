@@ -4,9 +4,11 @@ Nuncio is a command-line tool for keeping your GIT repositories and NPM projects
 
 Nuncio is ideal for CI and CD environments.
 
+
 ### Pre-requisites
 
 Besides Node and NPM, of course, Nuncio expects you to have GIT installled in the environment. 
+
 
 ### Usage
 
@@ -35,6 +37,7 @@ You can also pass `--npm` flag to deploy the version to you NPM registry.
 $ nuncio --npm
 ```
 
+
 ### What does it do
 
 Assuming a NPM library with the version `1.0.0`, the following command
@@ -53,6 +56,7 @@ Will result in:
 - Finally it publishes the source code to NPM
 - Nuncio will try to rollback all completed steps if it finds and an error
 
+
 ### Reference
 
 | **Command** | **Description**                                         | **Default** | **Alias** |
@@ -61,5 +65,5 @@ Will result in:
 | `semver`    | Tells Nuncio the version segment it must increase       | *major*     | `s`       |
 | `remote`    | The remote branch to which Nuncio will push the changes | *origin*    | `r`       |
 | `message`   | Defines the commit and tag message                      | none        | `m`       |
-| `prefix`    | Sets the prefix of the tag name                         | *false*     | `p`       |
+| `prefix`    | Sets the prefix of the tag name                         | *v*         | `p`       |
 | `npm`       | This flag defines whether Nuncio must publish to NPM    | *false*     | none      |
