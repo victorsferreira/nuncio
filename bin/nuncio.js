@@ -27,6 +27,7 @@ const { npm } = argv;
 const branch = (argv.branch || argv.b) || 'master';
 const semver = (argv.semver || argv.s) || 'major';
 const remote = (argv.remote || argv.r) || 'origin';
+const prefix = (argv.prefix || argv.p) || 'v';
 const message = argv.message || argv.m;
 
 versions[semver]++;
@@ -65,11 +66,11 @@ async function setVersionInPackageJson(newVersion) {
     return setVersionInPackageJson.bind(null, oldVersion);
 }
 
-async function createNewTag(version, message) {
-    const tagMessage = message || version;
-    await executeGitCommand(`tag -a ${version}`, { '-m': tagMessage });
+async function createNewTag(tagName, message) {
+    const tagMessage = message || tagName;
+    await executeGitCommand(`tag -a ${tagName}`, { '-m': tagMessage });
 
-    return executeGitCommand.bind(null, `tag -d ${version}`);
+    return executeGitCommand.bind(null, `tag -d ${tagName}`);
 }
 
 async function commitNewVersion(newVersion, message) {
@@ -93,15 +94,22 @@ async function publishOnNpm(appName, version) {
     `);
 }
 
-async function pushCommitAndTag(remote, branch, newVersion) {
+async function pushCommitAndTag(remote, branch, version, prefix) {
+    const tagName = `${prefix}${version}`;
     await executeGitCommand(`push ${remote} ${branch}`);
-    await executeGitCommand(`push ${remote} ${newVersion}`);
+    await executeGitCommand(`push ${remote} ${tagName}`);
 
-    return console.log.bind(null, `
+    return undoLastPush.bind(null, `
         Something went wrong and we could not revert the last operations. 
         Check your remote repository "${remote}" on branch "${branch}".
-        Look for a commit with message "chore: ${newVersion}" and the tag "${newVersion}" and remove them manually.
-    `);
+        Look for a commit with message "chore: ${version}" and the tag "${tagName}" and remove them manually.
+    `, remote, tagName);
+}
+
+async function undoLastPush(message, remote, tagName) {
+    await executeGitCommand(`push --delete ${remote} ${tagName}`);
+    
+    console.log(message);
 }
 
 (async () => {
@@ -115,9 +123,9 @@ async function pushCommitAndTag(remote, branch, newVersion) {
         // Add files and commit
         rollbacks.push(await commitNewVersion(newVersion, message));
         // Create tag
-        rollbacks.push(await createNewTag(newVersion, message));
+        rollbacks.push(await createNewTag(`${prefix}${newVersion}`, message));
         // Push commit and tag
-        rollbacks.push(await pushCommitAndTag(remote, branch, newVersion));
+        rollbacks.push(await pushCommitAndTag(remote, branch, `${prefix}${newVersion}`));
         // Publish on NPM
         if (npm) {
             rollbacks.push(await publishOnNpm(appName, newVersion));
