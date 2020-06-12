@@ -101,7 +101,7 @@ async function publishOnNpm(appName, version) {
     `);
 }
 
-async function pushCommitAndTag(remote, branch, version, prefix) {
+async function pushCommitAndTag(remote, branch, prefix, version) {
     const tagName = `${prefix}${version}`;
 
     console.log(`Pushing commit and tag`);
@@ -135,7 +135,7 @@ async function undoLastPush(message, remote, tagName) {
         // Create tag
         rollbacks.push(await createNewTag(`${prefix}${newVersion}`, message));
         // Push commit and tag
-        rollbacks.push(await pushCommitAndTag(remote, branch, `${prefix}${newVersion}`));
+        rollbacks.push(await pushCommitAndTag(remote, branch, prefix, newVersion));
         // Publish on NPM
         if (npm) {
             rollbacks.push(await publishOnNpm(appName, newVersion));
