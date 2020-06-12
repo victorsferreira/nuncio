@@ -1,6 +1,6 @@
 {
   "name": "nuncio-cli",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Nuncio is a command-line tool for keeping your GIT repositories and NPM projects updated",
   "main": "index.js",
   "scripts": {},
