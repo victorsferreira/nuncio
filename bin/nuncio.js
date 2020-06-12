@@ -142,8 +142,11 @@ async function undoLastPush(message, remote, tagName) {
         }
     } catch (err) {
         console.log(err.stderr);
+        let index = 0;
         // Rollback the finished tasks
         for (let rollback of rollbacks) {
+            index++;
+            console.log(`Rolling back step ${index}`);
             await rollback();
         }
 
